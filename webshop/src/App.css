@@ -41,6 +41,9 @@
   font-display: swap;
   src: url(https://fonts.gstatic.com/s/oswald/v53/TK3_WkUHHAIjg75cFRf3bXL8LICs1xZogUE.ttf) format('truetype');
 }
+:root {
+  --leftbox-width: 240px;
+}
 .GUI {
   background-color: white;
   height: 150px;
@@ -59,6 +62,13 @@
 }
 .GUI .GUI-link {
   background-color: white;
+  text-decoration: none;
+  box-sizing: border-box;
+  font-size: 16px;
+  padding-top: 10px;
+}
+.up {
+  transform: translateY(-1px);
 }
 .dropdown {
   position: relative;
@@ -84,8 +94,15 @@
 .dropdown:hover .dropdown-content {
   display: block;
 }
+.GUI-left-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
 .none {
   background-color: transparent;
   border: none;
   margin: 0;
+  text-decoration: none;
+  color: gray;
 }

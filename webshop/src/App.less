@@ -1,6 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
 @import './css/uiverse.css';
 
+:root {
+    --leftbox-width: 240px;
+}
+
 .GUI {
         background-color: white;
         height: 150px;
@@ -18,7 +22,15 @@
         }
         .GUI-link {
             background-color: white;
+            text-decoration: none;
+            box-sizing: border-box;
+            font-size: 16px;
+            padding-top: 10px;
         }
+}
+
+.up {
+    transform: translateY(-1px);
 }
 
 .dropdown {
@@ -50,8 +62,16 @@
     }
 }
 
+.GUI-left-box {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
 .none {
     background-color: transparent;
     border: none;
     margin: 0;
+    text-decoration: none;
+    color: gray;
 }

@@ -1,0 +1,33 @@
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(calc(100vw - var(--leftbox-width) - 50px) / 3);
+  border: 1px solid black;
+  margin: 10px;
+}
+.leftbox-outline {
+  display: inline-block;
+}
+.leftbox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: var(--leftbox-width);
+  height: calc(100vh - 180px);
+  border: 1px solid black;
+  margin: 10px;
+}
+.catalog-outline {
+  display: inline-block;
+}
+.catalog {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-gap: 4px;
+  justify-content: center;
+  align-items: center;
+  width: calc(100vw - var(--leftbox-width) - 40px);
+}
