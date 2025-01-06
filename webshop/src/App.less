@@ -29,6 +29,19 @@
         }
 }
 
+.GUI-searchButton {
+    background-color: transparent;
+    border: none;
+    width: 100%;
+    height: 100%;
+    transform: scale(1.1); 
+}
+
+.GUI-searchButton:hover {
+    cursor: pointer;
+}
+
+
 .up {
     transform: translateY(-1px);
 }
@@ -75,3 +88,9 @@
     text-decoration: none;
     color: gray;
 }
+
+@media only screen and (max-width: 720px) {
+    .GUI-buttons {
+        display: none;
+    }
+  }

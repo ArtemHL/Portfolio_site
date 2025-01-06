@@ -1,11 +1,37 @@
+
 .item {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: calc(calc(100vw - var(--leftbox-width) - 50px) / 3);
-  border: 1px solid black;
+  height: 300px;
+  max-width: 6fr;
+  border-bottom: 1px solid gray;
+  border-right: 1px solid gray;
+  box-shadow: 2px 2px 2px #757474;
   margin: 10px;
+  padding: 7px;
+  position: relative;
+  /* For aspect-ratio tricks */
+}
+.item-image-wrapper {
+  position: relative;
+  /* Create a containing block */
+  width: 90%;
+  /* Adjust as needed */
+  padding-bottom: 90%;
+  /* Ensures a 1:1 aspect ratio (90% width and height) */
+  overflow: hidden;
+  /* Hide overflow to crop the image */
+}
+.item-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Ensure the image covers the square area */
 }
 .leftbox-outline {
   display: inline-block;
@@ -22,12 +48,22 @@
 }
 .catalog-outline {
   display: inline-block;
+  vertical-align: top;
 }
 .catalog {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  grid-gap: 4px;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  grid-gap: 1px;
   justify-content: center;
   align-items: center;
   width: calc(100vw - var(--leftbox-width) - 40px);
+}
+@media only screen and (max-width: 720px) {
+  .leftbox {
+      display: none;
+  }
+  .catalog {
+      width: 100vw;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
 }
