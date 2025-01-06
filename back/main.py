@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from auth.app.database import engine, Base
 from auth.app.routes import auth, protected
+from auth.emailVerfi.email import email_router
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -20,3 +21,4 @@ app.add_middleware(
 # Include routers
 app.include_router(auth.router)
 app.include_router(protected.router)
+app.include_router(email_router)
