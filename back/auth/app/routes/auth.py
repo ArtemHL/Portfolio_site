@@ -12,23 +12,34 @@ router = APIRouter()
 @router.post("/register")
 def register(user: UserCreate, db: Session = Depends(get_db)):
     try:
-        # Проверяем существование пользователя
+        # Проверяем существование пользователя по email и username
+        if db.query(User).filter(User.email == user.email).first():
+            raise HTTPException(
+                status_code=400,
+                detail="Email already registered"
+            )
+        
         if db.query(User).filter(User.username == user.username).first():
             raise HTTPException(
                 status_code=400,
-                detail="Username already registered"
+                detail="Username already taken"
             )
         
         # Создаем нового пользователя
         hashed_password = pwd_context.hash(user.password)
-        db_user = User(username=user.username, password=hashed_password)
+        db_user = User(
+            username=user.username,
+            email=user.email,
+            password=hashed_password
+        )
         
         db.add(db_user)
         db.commit()
         
         return {
             "message": "User created successfully",
-            "username": user.username
+            "username": user.username,
+            "email": user.email
         }
         
     except ValidationError as e:
@@ -45,11 +56,13 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login")
 def login(creds: UserLogin, response: Response, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.username == creds.username).first()
+    # Ищем пользователя по email вместо username
+    user = db.query(User).filter(User.email == creds.email).first()
     if not user or not pwd_context.verify(creds.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    token = security.create_access_token(creds.username)
+    # Создаем токен на основе email вместо username
+    token = security.create_access_token(user.email)
     response.set_cookie(
         settings.auth_config.JWT_ACCESS_COOKIE_NAME,
         token,
