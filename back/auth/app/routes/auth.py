@@ -68,9 +68,9 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
         )
 
 @router.post("/verify-email")
-async def verify_email(email: str, code: str, db: Session = Depends(get_db)):
+async def verify_email(verification_data: VerificationRequest, db: Session = Depends(get_db)):
     verification = db.query(EmailVerification).filter(
-        EmailVerification.email == email
+        EmailVerification.email == verification_data.email
     ).first()
     
     if not verification:
