@@ -21,7 +21,7 @@ const ConfirmationPopUp = ({email}) => {
             },
             body: JSON.stringify({
                 email: email1,
-                сode: verificationCode
+                code: verificationCode
             }),
         })
             .then((response) => response.json())
@@ -55,7 +55,7 @@ const ConfirmationPopUp = ({email}) => {
                         <div className="confirmation-popup-body">
                             <form onSubmit={handleCheckVerification}>
                                 <input
-                                    type="number"
+                                    type="text"
                                     name="verificationCode"
                                     placeholder="Enter verification code"
                                 />
