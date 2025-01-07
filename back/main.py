@@ -1,42 +1,28 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from auth.app.routes.auth import router as auth_router
+from auth.emailVerfi import email_router
 from auth.app.database import engine, Base
-from auth.app.routes import auth, protected
-from auth.emailVerfi.email import email_router
-
-# Create tables
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 # Настройка CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Роуты аутентификации
-app.include_router(
-    auth.router,
-    tags=["authentication"]
-)
+# Создаем таблицы
+Base.metadata.create_all(bind=engine)
 
-# Защищенные роуты
-app.include_router(
-    protected.router,
-    tags=["protected"]
-)
+# Подключаем роуты
+app.include_router(auth_router, tags=["auth"])
+app.include_router(email_router, tags=["email"])
 
-# Роуты для email верификации
-app.include_router(
-    email_router,
-    tags=["email"]
-)
-
-# Корневой роут для проверки API
+# Корневой роут для проверки
 @app.get("/")
 async def root():
-    return {"message": "Welcome to FastAPI Auth System"}
+    return {"message": "API is running"}
