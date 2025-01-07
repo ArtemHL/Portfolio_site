@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Response, Body
 from sqlalchemy.orm import Session
 from ..dependencies import get_db
 from ..models.user import User
@@ -9,7 +9,7 @@ from ...emailVerfi.verification import EmailVerification
 from datetime import datetime, timedelta
 from ...emailVerfi.gencode import generate_verification_code
 import json
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 router = APIRouter()
 
@@ -18,8 +18,16 @@ router = APIRouter()
 
 # Создаем Pydantic модель для верификации
 class VerificationRequest(BaseModel):
-    email: str
+    email: EmailStr
     code: str
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "email": "user@example.com",
+                "code": "123456"
+            }
+        }
 
 @router.post("/register")
 async def register(user: UserCreate, db: Session = Depends(get_db)):
@@ -68,7 +76,16 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
         )
 
 @router.post("/verify-email")
-async def verify_email(verification_data: VerificationRequest, db: Session = Depends(get_db)):
+async def verify_email(
+    verification_data: VerificationRequest = Body(
+        ...,
+        example={
+            "email": "user@example.com",
+            "code": "123456"
+        }
+    ),
+    db: Session = Depends(get_db)
+):
     verification = db.query(EmailVerification).filter(
         EmailVerification.email == verification_data.email
     ).first()
