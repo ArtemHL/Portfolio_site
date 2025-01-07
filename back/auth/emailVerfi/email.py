@@ -1,81 +1,77 @@
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
-from fastapi import APIRouter, Depends, HTTPException
-from .gencode import generate_verification_code
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from .verification import EmailVerification
 from ..app.dependencies import get_db
+from .verification import EmailVerification
+from .gencode import generate_verification_code
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 
-email_router = APIRouter()
-
-# Конфигурация почты
-conf = ConnectionConfig(
-    MAIL_USERNAME = "shopermna@gmail.com",
-    MAIL_PASSWORD = "uhxy bcdg ncsm nwqc ",
-    MAIL_FROM = "shopermna@gmail.com",
-    MAIL_PORT = 587,
-    MAIL_SERVER = "smtp.gmail.com",
-    MAIL_STARTTLS = True,
-    MAIL_SSL_TLS = False,
-    USE_CREDENTIALS = True
-)
+# Создаем роутер
+router = APIRouter()
 
 async def send_verification_email(email: str, db: Session):
-    """Отправляет email с кодом верификации"""
+    # Получаем код верификации
+    verification = db.query(EmailVerification).filter(
+        EmailVerification.email == email
+    ).first()
+    
+    if not verification:
+        return False
+    
+    # Настройки SMTP
+    smtp_server = "smtp.gmail.com"
+    smtp_port = 587
+    sender_email = "shopermna@gmail.com"  # Замените на ваш email
+    password = "bron uwld nyns nqtm "  # Замените на ваш пароль приложения
+    
+    # Создаем сообщение
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = email
+    message["Subject"] = "Email Verification Code"
+    
+    body = f"Your verification code is: {verification.code}"
+    message.attach(MIMEText(body, "plain"))
+    
     try:
-        # Получаем существующую запись верификации
-        verification = db.query(EmailVerification).filter(
-            EmailVerification.email == email
-        ).first()
+        # Подключаемся к SMTP серверу
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(sender_email, password)
         
-        if not verification:
-            raise HTTPException(status_code=404, detail="Verification record not found")
-        
-        # Отправляем email с существующим кодом
-        message = MessageSchema(
-            subject="Email Verification",
-            recipients=[email],
-            body=f"Your verification code is: {verification.code}",
-            subtype=MessageType.plain
-        )
-        
-        fm = FastMail(conf)
-        await fm.send_message(message)
+        # Отправляем email
+        server.send_message(message)
+        server.quit()
+        return True
         
     except Exception as e:
         print(f"Error sending email: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error sending verification email: {str(e)}"
-        )
+        return False
 
-@email_router.post("/send-email")
-async def resend_verification(email: str, db: Session = Depends(get_db)):
-    """Эндпоинт для повторной отправки кода"""
+# Добавляем роут для повторной отправки кода
+@router.post("/resend-code")
+async def resend_verification_code(email: str, db: Session = Depends(get_db)):
+    verification = db.query(EmailVerification).filter(
+        EmailVerification.email == email
+    ).first()
+    
+    if not verification:
+        return {"success": False, "message": "Email not found"}
+    
+    # Генерируем новый код
+    new_code = generate_verification_code()
+    verification.code = new_code
+    verification.created_at = datetime.utcnow()
+    
     try:
-        verification = db.query(EmailVerification).filter(
-            EmailVerification.email == email
-        ).first()
-        
-        if not verification:
-            raise HTTPException(
-                status_code=404,
-                detail="No verification record found"
-            )
-        
-        # Обновляем код и время создания
-        verification.code = generate_verification_code()
-        verification.created_at = datetime.utcnow()
         db.commit()
-        
         # Отправляем новый код
-        await send_verification_email(email, db)
-        
-        return {"message": "New verification code sent"}
-        
+        if await send_verification_email(email, db):
+            return {"success": True, "message": "New verification code sent"}
+        else:
+            return {"success": False, "message": "Failed to send verification code"}
     except Exception as e:
         db.rollback()
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error resending verification code: {str(e)}"
-        )
+        return {"success": False, "message": str(e)}

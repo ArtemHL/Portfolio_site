@@ -1,24 +1,25 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import os
+import time
 
-# Получаем абсолютный путь к директории, где находится database.py
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
 
-# Формируем путь к базе данных
-SQLALCHEMY_DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'sql_app.db')}"
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, 
+    connect_args={
+        "check_same_thread": False,
+        "timeout": 30,  # Увеличиваем таймаут
+    },
+    # Добавляем pool_size и max_overflow для лучшего управления соединениями
+    pool_size=5,
+    max_overflow=10
+)
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL, 
-                       connect_args={
-                                "check_same_thread": False,
-                                "timeout": 30,
-                                "isolation_level": "IMMEDIATE"
-                                })
 SessionLocal = sessionmaker(
     autocommit=False, 
     autoflush=False, 
-    bind=engine,
-    expire_on_commit=False
+    bind=engine
 )
+
 Base = declarative_base()

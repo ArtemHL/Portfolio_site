@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from ...emailVerfi.gencode import generate_verification_code
 import json
 from pydantic import BaseModel, EmailStr
+import time
 
 router = APIRouter()
 
@@ -30,8 +31,11 @@ class VerificationRequest(BaseModel):
         }
 
 @router.post("/register")
-async def register(user: UserCreate):
-    with get_db() as db:
+async def register(user: UserCreate, db: Session = Depends(get_db)):
+    max_retries = 3
+    retry_delay = 1  # секунда
+    
+    for attempt in range(max_retries):
         try:
             # Проверяем существующую верификацию
             existing_verification = db.query(DBEmailVerification).filter(
@@ -67,6 +71,9 @@ async def register(user: UserCreate):
             
         except Exception as e:
             db.rollback()
+            if attempt < max_retries - 1:  # Если это не последняя попытка
+                time.sleep(retry_delay)  # Ждем перед следующей попыткой
+                continue
             print(f"Registration error: {str(e)}")
             raise HTTPException(
                 status_code=500,
