@@ -9,8 +9,17 @@ from ...emailVerfi.verification import EmailVerification
 from datetime import datetime, timedelta
 from ...emailVerfi.gencode import generate_verification_code
 import json
+from pydantic import BaseModel
 
 router = APIRouter()
+
+# Создаем схему для входящих данных верификации
+
+
+# Создаем Pydantic модель для верификации
+class VerificationRequest(BaseModel):
+    email: str
+    code: str
 
 @router.post("/register")
 async def register(user: UserCreate, db: Session = Depends(get_db)):
@@ -122,17 +131,6 @@ async def verify_email(email: str, code: str, db: Session = Depends(get_db)):
 
 @router.post("/login")
 async def login(creds: UserLogin, response: Response, db: Session = Depends(get_db)):
-    # Проверяем, не находится ли email в процессе верификации
-    verification = db.query(EmailVerification).filter(
-        EmailVerification.email == creds.email
-    ).first()
-    
-    if verification:
-        raise HTTPException(
-            status_code=401, 
-            detail="Email not verified. Please verify your email first."
-        )
-    
     # Ищем пользователя
     user = db.query(User).filter(User.email == creds.email).first()
     
