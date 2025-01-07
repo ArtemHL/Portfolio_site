@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../css/loginRegister.css';
 import { Link } from 'react-router-dom';
+import GUI from '../components/GUI';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -14,7 +15,9 @@ const Login = () => {
     };
 
     return (
-        <div className="login-container">
+        <div>
+          <GUI></GUI>
+          <div className="login-container">
                 <form class="form">
     <div class="flex-column">
       <label>Email </label></div>
@@ -43,6 +46,7 @@ const Login = () => {
 
     </p>
             </form>
+        </div>
         </div>
     );
 };
