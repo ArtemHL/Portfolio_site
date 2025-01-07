@@ -89,7 +89,7 @@ async def verify_email(verification_data: VerificationRequest, db: Session = Dep
         )
     
     # Проверяем код
-    if verification.code != code:
+    if verification.code != verification_data.code:
         raise HTTPException(
             status_code=400,
             detail="Invalid verification code"
@@ -97,7 +97,7 @@ async def verify_email(verification_data: VerificationRequest, db: Session = Dep
     
     try:
         # Проверяем, не существует ли уже пользователь
-        if db.query(User).filter(User.email == email).first():
+        if db.query(User).filter(User.email == verification_data.email).first():
             db.delete(verification)
             db.commit()
             raise HTTPException(status_code=400, detail="Email already registered")
@@ -119,7 +119,7 @@ async def verify_email(verification_data: VerificationRequest, db: Session = Dep
         
         return {
             "message": "Email verified and registration completed successfully",
-            "email": email
+            "email": verification_data.email
         }
         
     except Exception as e:
