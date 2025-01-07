@@ -27,7 +27,7 @@ const ConfirmationPopUp = ({email}) => {
             .then((response) => response.json())
             .then((data) => {
                 console.log(data);
-                if (data.status === 'success') {
+                if (data.message === 'Email verified and registration completed successfully') {
                     alert('Email verified successfully');
                     navigate('/login');
                 } else {
