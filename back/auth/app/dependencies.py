@@ -1,3 +1,4 @@
+from fastapi import Depends
 from .database import SessionLocal
 
 def get_db():
