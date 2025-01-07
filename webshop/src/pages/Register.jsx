@@ -4,12 +4,14 @@ import { Link } from 'react-router-dom';
 import GUI from '../components/GUI.jsx';
 import { useNavigate } from 'react-router-dom';
 import ConfirmationPopUp from '../components/ConfirmationPopUp.jsx';
+import Loader from '../components/Loader.jsx';
 
 const Register = () => {
 
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -20,6 +22,7 @@ const Register = () => {
     const password = formData.get('password');
     const confirmPassword = formData.get('confirmPassword');
     if (password !== confirmPassword) return alert('Passwords do not match');
+    setIsLoading(true);
     fetch('http://localhost:6655/register', {
       method: 'POST',
       headers: {
@@ -34,16 +37,21 @@ const Register = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
+        setIsLoading(false);
         setIsVisible(true);
       })
       .catch((error) => {
         console.error('Error:', error);
+        setIsLoading(false);
         return error;
-      });
+      }
+      
+    );
   };
 
   return (
     <div>
+      {isLoading && <Loader></Loader>}
       <GUI></GUI>
       <div className="login-container">
 

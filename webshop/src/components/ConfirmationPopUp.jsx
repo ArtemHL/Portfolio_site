@@ -46,11 +46,15 @@ const ConfirmationPopUp = ({email}) => {
 
     return (
                 <div>
+                    {isVisible && (<div>
                     <div className="confirmation-popup-back" onClick={handleClose}>
                     </div>
                     <div className="confirmation-popup">
+                        <button className="close-btn" onClick={handleClose}>X
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-x-circle" viewBox="0 0 16 16"></svg>
+                        </button>
                         <div className="confirmation-popup-header">
-                            <h2>Confirmation</h2>
+                            <h2>Verification code was sent to your email</h2>
                         </div>
                         <div className="confirmation-popup-body">
                             <form onSubmit={handleCheckVerification}>
@@ -63,6 +67,7 @@ const ConfirmationPopUp = ({email}) => {
                             </form>
                         </div>
                     </div>
+                </div>)}
                 </div>
     )
 }

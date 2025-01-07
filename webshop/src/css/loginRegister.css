@@ -124,6 +124,7 @@
 }
 .confirmation-popup {
   position: fixed;
+  text-align: center;
   width: 80%;
   height: 20vh;
   top: calc(30%);
@@ -137,4 +138,13 @@
   z-index: 11;
   opacity: 1;
   transition: opacity 0.3s ease-in-out;
+}
+.close-btn {
+  align-self: flex-end;
+  cursor: pointer;
+  color: #2d79f3;
+  font-size: 20px;
+  font-weight: 600;
+  background-color: transparent;
+  border: none;
 }

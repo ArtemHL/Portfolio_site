@@ -5,11 +5,13 @@ import GUI from '../components/GUI';
 import { useDispatch } from 'react-redux';
 import { login } from '../redux/authActions';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../components/Loader';
 
 const Login = () => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
 
 
     const handleSubmit = (e) => {
@@ -17,6 +19,7 @@ const Login = () => {
         const formData = new FormData(e.target);
         const email = formData.get('email');
         const password = formData.get('password');
+        setIsLoading(true);
         fetch('http://localhost:6655/login', {
             method: 'POST',
             headers: {
@@ -30,6 +33,7 @@ const Login = () => {
             .then((response) => response.json())
             .then((data) => {
                 console.log(data.message);
+                setIsLoading(false);
                 if(data.message === 'Login successful'){
                     dispatch(login(email));
                     navigate('/account');
@@ -37,12 +41,14 @@ const Login = () => {
             })
             .catch((error) => {
                 console.error('Error:', error);
+                setIsLoading(false);
                 return error;
             });
     };
 
     return (
         <div>
+          {isLoading && <Loader></Loader>}
           <GUI></GUI>
           <div className="login-container">
                 <form class="form" onSubmit={handleSubmit}> 
