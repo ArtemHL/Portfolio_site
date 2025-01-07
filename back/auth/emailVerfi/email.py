@@ -20,64 +20,62 @@ conf = ConnectionConfig(
     USE_CREDENTIALS = True
 )
 
-@email_router.post("/send-email")
-async def send_verification_email(email: str, db: Session = Depends(get_db)):
+async def send_verification_email(email: str, db: Session):
+    """Отправляет email с кодом верификации"""
     try:
-        code = generate_verification_code()
+        # Получаем существующую запись верификации
+        verification = db.query(EmailVerification).filter(
+            EmailVerification.email == email
+        ).first()
         
-        # Сохраняем код в базе
-        verification = EmailVerification(
-            email=email,
-            code=code,
-            created_at=datetime.utcnow()
-        )
-        db.add(verification)
-        db.commit()
+        if not verification:
+            raise HTTPException(status_code=404, detail="Verification record not found")
         
-        # Отправляем email
+        # Отправляем email с существующим кодом
         message = MessageSchema(
             subject="Email Verification",
             recipients=[email],
-            body=f"Your verification code is: {code}",
+            body=f"Your verification code is: {verification.code}",
             subtype=MessageType.plain
         )
         
         fm = FastMail(conf)
         await fm.send_message(message)
         
-        return {"message": "Verification code sent"}
     except Exception as e:
-        if 'db' in locals():  # Проверяем, существует ли db
-            db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error sending email: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error sending verification email: {str(e)}"
+        )
 
-# Отдельная функция для отправки кода при регистрации
-async def send_verification_code(email: str, db: Session):
+@email_router.post("/send-email")
+async def resend_verification(email: str, db: Session = Depends(get_db)):
+    """Эндпоинт для повторной отправки кода"""
     try:
-        code = generate_verification_code()
+        verification = db.query(EmailVerification).filter(
+            EmailVerification.email == email
+        ).first()
         
-        # Сохраняем код в базе
-        verification = EmailVerification(
-            email=email,
-            code=code,
-            created_at=datetime.utcnow()
-        )
-        db.add(verification)
+        if not verification:
+            raise HTTPException(
+                status_code=404,
+                detail="No verification record found"
+            )
+        
+        # Обновляем код и время создания
+        verification.code = generate_verification_code()
+        verification.created_at = datetime.utcnow()
         db.commit()
         
-        # Отправляем email
-        message = MessageSchema(
-            subject="Email Verification",
-            recipients=[email],
-            body=f"Your verification code is: {code}",
-            subtype=MessageType.plain
-        )
+        # Отправляем новый код
+        await send_verification_email(email, db)
         
-        fm = FastMail(conf)
-        await fm.send_message(message)
+        return {"message": "New verification code sent"}
         
-        return code
     except Exception as e:
-        if db:
-            db.rollback()
-        raise e
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error resending verification code: {str(e)}"
+        )

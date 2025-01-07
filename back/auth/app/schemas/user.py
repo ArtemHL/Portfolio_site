@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator, EmailStr
+from pydantic import BaseModel, validator, EmailStr
 import re
 
 class UserBase(BaseModel):
@@ -8,8 +8,7 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str
 
-    @field_validator('password')
-    @classmethod
+    @validator('password')
     def validate_password(cls, v):
         if len(v) < 8:
             raise ValueError('Password must be at least 8 characters long')
@@ -20,12 +19,6 @@ class UserCreate(UserBase):
         if not re.search(r'\d', v):
             raise ValueError('Password must contain at least one digit')
             
-        return v
-
-    @field_validator('email')
-    @classmethod
-    def validate_email(cls, v):
-        # Дополнительная валидация email если нужна
         return v
 
 class UserLogin(BaseModel):
