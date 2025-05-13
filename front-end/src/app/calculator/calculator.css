@@ -1,0 +1,147 @@
+.config-wrapper {
+    max-width: 1100px;
+    margin: 40px auto;
+    display: flex;
+    gap: 40px;
+    padding: 20px;
+    font-family: sans-serif;
+  }
+  
+  .config-left,
+  .config-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .config-preview-box,
+  .config-price-box {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 16px;
+    background: #fff;
+  }
+  
+  .config-preview {
+    height: 300px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .config-caption {
+    margin-top: 8px;
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+  }
+  
+  .old-price {
+    text-decoration: line-through;
+    color: #999;
+  }
+  
+  .new-price {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1a7f37;
+  }
+  
+  .discount {
+    font-size: 14px;
+    color: #cc0000;
+    font-weight: 500;
+  }
+  
+  .add-button {
+    background-color: #1a7f37;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .footer-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .flex-row {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .input-field {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  
+  .button-active {
+    flex: 1;
+    padding: 10px;
+    background-color: #333;
+    color: #fff;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .button-passive {
+    flex: 1;
+    padding: 10px;
+    background-color: #f9f9f9;
+    color: #333;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+  }
+  
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
+  }
+  
+  .color-card {
+    padding: 10px;
+    border-radius: 10px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 12px;
+    border: 1px solid #ccc;
+  }
+  
+  .color-card.selected {
+    border: 2px solid #0070f3;
+  }
+  
+  .color-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #ddd;
+    margin-bottom: 8px;
+  }
+  
+  .color-label {
+    color: #777;
+    font-size: 11px;
+  }
