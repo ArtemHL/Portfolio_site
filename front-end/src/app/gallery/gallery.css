@@ -1,0 +1,9 @@
+.fancyform {
+    width: 400px;
+}
+
+@media (max-width: 600px) {
+    .fancyform {
+        width: 300px;
+    }
+}

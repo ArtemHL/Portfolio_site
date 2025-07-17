@@ -1,0 +1,74 @@
+version: '3.3'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: flask_backend
+    restart: unless-stopped
+    environment:
+      - FLASK_ENV=production
+      - FLASK_APP=main.py
+      - SMTP_SERVER=${SMTP_SERVER}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - RECIPIENT_EMAIL=${RECIPIENT_EMAIL}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - DOMAIN=${DOMAIN}
+      - WWW_DOMAIN=${WWW_DOMAIN}
+      - EMAIL=${EMAIL}
+    volumes:
+      - ./backend/logs:/app/logs
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+    container_name: nextjs_frontend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443" 
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/logs:/var/log/nginx
+      - /etc/letsencrypt:/etc/letsencrypt:ro  # Mount SSL certificates
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: >
+      /bin/sh -c "nginx -t && nginx -g 'daemon off;'"
+
+networks:
+  app_network:
+    driver: bridge

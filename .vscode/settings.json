@@ -1,0 +1,7 @@
+{
+    "python.defaultInterpreterPath": "C:/Users/nstec/Projects/flask_app-1/venv/Scripts/python.exe",
+    "python.terminal.activateEnvironment": true,
+    "code-runner.executorMap": {
+        "python": "C:/Users/nstec/Projects/flask_app-1/venv/Scripts/python.exe -u"
+    }
+} 

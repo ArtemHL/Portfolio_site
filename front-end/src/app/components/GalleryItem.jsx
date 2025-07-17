@@ -1,3 +1,4 @@
+import './components.css'
 
 export default function GalleryItem({ src, alt, label }) {
   return (
